@@ -81,7 +81,18 @@
     .intro-screen { justify-content: center; }
     .intro-screen h2 { font-size: 2rem; }
     .intro-symbol { display: grid; place-items: center; width: 63px; height: 63px; margin-bottom: 23px; border-radius: 19px; background: #f2ead9; font-size: 29px; }
-    .intro-screen .question-hint { margin-bottom: 24px; }
+    .intro-screen .question-hint { margin-bottom: 14px; }
+    .profile-form { display: grid; gap: 11px; }
+    .profile-field { display: grid; gap: 5px; }
+    .profile-field label { color: #425148; font-size: .76rem; font-weight: 750; }
+    .profile-field input { width: 100%; min-height: 41px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 10px; background: #fffefa; color: var(--ink); font: inherit; font-size: .82rem; }
+    .profile-field input:focus { border-color: var(--green); outline: 2px solid #284d3b22; }
+    .demo-notice { margin: 3px 0 0; padding: 9px 11px; border-left: 3px solid var(--gold); border-radius: 0 9px 9px 0; background: #f6f0e2; color: #4b554d; font-size: .74rem; line-height: 1.45; }
+    .demo-terms { display: flex; align-items: flex-start; gap: 8px; color: #7e817a; font-size: 8px; line-height: 1.35; }
+    .demo-terms input { flex: 0 0 auto; width: 15px; height: 15px; margin: 0; accent-color: var(--green); }
+    .demo-terms a { color: inherit; text-decoration: underline; }
+    .ethics-note { margin-top: 22px; padding: 14px 15px; border: 1px solid #e6dfd0; border-radius: 13px; background: #faf7ef; color: #566158; font-size: .73rem; line-height: 1.55; }
+    .ethics-note strong { display: block; margin-bottom: 4px; color: var(--green); font-size: .75rem; }
     .small-note { margin: 15px 0 0; color: #808a80; text-align: center; font-size: .72rem; line-height: 1.5; }
     .result-screen { text-align: center; }
     .result-icon { display: grid; place-items: center; width: 76px; height: 76px; margin: 0 auto 15px; border: 1px solid #e2c993; border-radius: 24px; background: #f7eedc; font-size: 38px; }
@@ -125,8 +136,15 @@
           <p class="question-kicker">Encontra o teu caminho</p>
           <h2>Pronto para partir?</h2>
           <p class="question-hint">São só cinco escolhas rápidas. Não há respostas certas — escolhe o que mais parece contigo e deixa a aventura revelar o resto.</p>
-          <button class="btn btn-primary" id="startButton" type="button">Começar o teste <span aria-hidden="true">→</span></button>
-          <p class="small-note">As tuas respostas ficam apenas nesta página.</p>
+          <form class="profile-form" id="profileForm">
+            <div class="profile-field"><label for="profileName">Nome</label><input id="profileName" name="name" autocomplete="name" required maxlength="80" placeholder="Como te chamamos?"></div>
+            <div class="profile-field"><label for="profileEmail">E-mail</label><input id="profileEmail" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="nome@exemplo.pt"></div>
+            <div class="profile-field"><label for="profileBirthDate">Data de nascimento</label><input id="profileBirthDate" name="birthDate" type="date" required></div>
+            <p class="demo-notice"><strong>Simulação académica:</strong> estes campos servem para demonstrar uma interface de recolha de dados. Os valores não são enviados nem guardados; usa dados fictícios.</p>
+            <label class="demo-terms" for="demoConsent"><input id="demoConsent" name="consent" type="checkbox" required><span>Ao continuar, aceito os <a href="#termos-demo">termos de exemplo</a> desta simulação.</span></label>
+            <button class="btn btn-primary" id="startButton" type="submit">Começar o teste <span aria-hidden="true">→</span></button>
+          </form>
+          <p class="small-note">Não introduzas dados reais. O questionário funciona localmente no teu navegador.</p>
         </section>
 
         <section class="screen" id="questionScreen" aria-live="polite">
@@ -147,6 +165,7 @@
           <div class="actions"><button class="btn btn-primary" id="restartButton" type="button">Voltar a jogar <span aria-hidden="true">↻</span></button></div>
         </section>
         <p class="footnote">Um teste leve, feito para se divertir — não é uma avaliação oficial.</p>
+        <aside class="ethics-note" id="termos-demo"><strong>Termos de exemplo e reflexão ética</strong>Esta cláusula de baixa visibilidade simula um padrão de design opaco e menciona, para fins críticos, autorização ampla para recolha, partilha e tratamento de dados pessoais. Não constitui consentimento real: o site não transmite nem conserva os dados. Interfaces que escondem condições reduzem a compreensão e a liberdade de escolha; consentimentos legítimos devem ser específicos, informados, destacados e revogáveis.</aside>
       </section>
     </div>
   </main>
@@ -216,6 +235,7 @@
     };
     const answers = Array(questions.length).fill(null);
     let currentQuestion = 0;
+    document.getElementById("profileBirthDate").max = new Date().toISOString().slice(0, 10);
 
     function showScreen(name) {
       Object.entries(screens).forEach(([key, screen]) => screen.classList.toggle("active", key === name));
@@ -283,7 +303,8 @@
       showScreen("result");
     }
 
-    document.getElementById("startButton").addEventListener("click", () => {
+    document.getElementById("profileForm").addEventListener("submit", (event) => {
+      event.preventDefault();
       currentQuestion = 0;
       answers.fill(null);
       renderQuestion();
